@@ -1,0 +1,67 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id         String   @id @default(cuid())
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  username   String   @unique
+  name       String?
+  password   String
+  role       String?  @default("user")
+  files      File[]
+}
+
+model File {
+  id                 String   @id @default(cuid())
+  file_name          String?
+  created_at         DateTime @default(now())
+  updated_at         DateTime @updatedAt
+  hash_value         String
+  patient_name       String?
+  patient_age        Int?
+  patient_sex        String?
+  date               String?
+  time               String?
+  muscle_name        String?
+  muscle_side        String?
+  amplitude          Int?
+  sampling_frequency Int?
+  records            Record[]
+  userId             String?
+  user               User?    @relation(fields: [userId], references: [id])
+  
+  @@unique([hash_value, userId])
+  status             Status   @default(TO_DO)
+}
+
+enum Status {
+  COMPLETED   // Đã hoàn thành
+  TO_DO       // Chưa hoàn thành
+  NEED_REVIEW // Cần chỉnh sửa
+}
+
+model Record {
+  id         String   @id @default(cuid())
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  start      Int
+  end        Int
+  label_name String
+  wave_no    Int
+  fileId     String?
+  file       File?    @relation(fields: [fileId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  note       String?
+}

@@ -1,0 +1,8 @@
+version: '3.9'
+
+services:
+  api:
+    image: ibme-tool-backend:latest
+    build: .
+    ports:
+      - '8201:4000' 
